@@ -65,7 +65,11 @@ model = Sequential()
 # flatten the 28x28x1 pixel input images to a row of pixels (a 1D-array)
 model.add(Flatten(input_shape=(28,28,1))) 
 # fully connected layer with 64 neurons and ReLU nonlinearity
-model.add(Dense(64, activation='relu'))
+model.add(Dense(256, activation='relu'))
+model.add(Dense(256, activation='relu'))
+model.add(Dense(256, activation='relu'))
+model.add(Dense(256, activation='relu'))
+
 # output layer with 10 nodes (one for each class) and softmax nonlinearity
 model.add(Dense(10, activation='softmax')) 
 
