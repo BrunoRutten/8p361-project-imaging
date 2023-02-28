@@ -47,7 +47,6 @@ def get_pcam_generators(base_dir, train_batch_size=32, val_batch_size=32):
                                              target_size=(IMAGE_SIZE, IMAGE_SIZE),
                                              batch_size=val_batch_size,
                                              class_mode='binary')
-
      return train_gen, val_gen
 
 
@@ -56,11 +55,11 @@ def get_model(kernel_size=(3,3), pool_size=(4,4), first_filters=32, second_filte
      # build the model
      model = Sequential()
 
-     model.add(Conv2D(first_filters, kernel_size, activation = 'relu', padding = 'same', input_shape = (IMAGE_SIZE, IMAGE_SIZE, 3)))
-     model.add(MaxPool2D(pool_size = pool_size))
+     # model.add(Conv2D(first_filters, kernel_size, activation = 'relu', padding = 'same', input_shape = (IMAGE_SIZE, IMAGE_SIZE, 3)))
+     # model.add(MaxPool2D(pool_size = pool_size))
 
-     model.add(Conv2D(second_filters, kernel_size, activation = 'relu', padding = 'same'))
-     model.add(MaxPool2D(pool_size = pool_size))
+     # model.add(Conv2D(second_filters, kernel_size, activation = 'relu', padding = 'same'))
+     # model.add(MaxPool2D(pool_size = pool_size))
 
      model.add(Flatten())
      model.add(Dense(64, activation = 'relu'))
@@ -78,10 +77,24 @@ model = get_model()
 
 
 # get the data generators
-train_gen, val_gen = get_pcam_generators('/change/me/to/dataset/path')
+train_gen, val_gen = get_pcam_generators('C:/Users/20202181/OneDrive - TU Eindhoven/Desktop/Project imaging')
 
+# lablist = val_gen.classes
+# for x in lablist:
+#      print(x)
 
+# for x in val_gen:
+#      print(x)
+#      i += 1
+#      for y in x[1]:
+#           lablist.append(y)
+#      print(i)
+# print(len(val_gen),len(lablist))
+# lablist = []
 
+# for x in val_gen:
+#      lablist.append(x[1])
+#      print(lablist)
 # save the model and weights
 model_name = 'my_first_cnn_model'
 model_filepath = model_name + '.json'
@@ -105,9 +118,26 @@ val_steps = val_gen.n//val_gen.batch_size
 history = model.fit(train_gen, steps_per_epoch=train_steps,
                     validation_data=val_gen,
                     validation_steps=val_steps,
-                    epochs=3,
+                    epochs=1,
                     callbacks=callbacks_list)
 
 # ROC analysis
+# vallabs = val_gen.classes.copy()
+# print(vallabs)
+ilist = []
+lablist = []
+for i in range(val_steps):
+     print(i)
+     for j in range(val_gen.batch_size):
+          ilist.append(val_gen[i][0][j])
+          lablist.append(val_gen[i][1][j])
+
+# print(lablist)
+valscore = model.predict(ilist)
+# print(valscore)
+fpr, tpr, thresholds = roc_curve(lablist, valscore, pos_label=2)
+print('fpr', fpr, 'tpr', tpr, 'thresholds', thresholds)
+roc_auc = auc(fpr, tpr)
+print('roc_auc', roc_auc)
 
 # TODO Perform ROC analysis on the validation set
